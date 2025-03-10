@@ -1,0 +1,66 @@
+[
+  {
+    "question": "Solve the system of equations for \\( x \\) and \\( y \\): \n\n \\begin{equation} 2x + 3y = 12 \\end{equation} \n \\begin{equation} 4x - y = 5 \\end{equation}",
+    "answer": [
+      "Multiply the second equation by 3 to align coefficients with the first equation: \\begin{equation} 12x - 3y = 15 \\end{equation}",
+      "Add the two equations: \\begin{equation} 14x = 27 \\end{equation}",
+      "Solve for \\( x \\): \\begin{equation} x = 1.92 \\end{equation}",
+      "Substituting \\( x \\) in the first equation: \\begin{equation} 3.84 + 3y = 12 \\end{equation}",
+      "Solving for \\( y \\): \\begin{equation} y = 2.72 \\end{equation}"
+    ],
+    "answer_template": [
+      "Multiply the second equation by --INSERT--: \\begin{equation} --INSERT-- \\end{equation}",
+      "Add the two equations: \\begin{equation} --INSERT--x = 27 \\end{equation}",
+      "Solve for \\( x \\): \\begin{equation} x = --INSERT-- \\end{equation}",
+      "Substituting \\( x \\) in the first equation: \\begin{equation} --INSERT-- + --INSERT--y = 12 \\end{equation}",
+      "Solving for \\( y \\): \\begin{equation} y = --INSERT-- \\end{equation}"
+    ]
+  },
+  {
+    "question": "Complete the missing values in the table below for the equation \\( y = 3x + 2 \\).",
+    "answer": [
+      "\\begin{table}[h] \n    \\centering \n    \\begin{tabular}{|c|c|} \n        \\hline \n        \\textbf{X} & \\textbf{Y} \\\\ \n        \\hline \n        -1 & -1 \\\\ \n        0 & 2 \\\\ \n        1 & 5 \\\\ \n        2 & 8 \\\\ \n        3 & 11 \\\\ \n        \\hline \n    \\end{tabular} \n \\end{table}"
+    ],
+    "answer_template": [
+      "\\begin{table}[h] \n    \\centering \n    \\begin{tabular}{|c|c|} \n        \\hline \n        \\textbf{X} & \\textbf{Y} \\\\ \n        \\hline \n        -1 & --INSERT-- \\\\ \n        0 & --INSERT-- \\\\ \n        1 & --INSERT-- \\\\ \n        2 & --INSERT-- \\\\ \n        3 & --INSERT-- \\\\ \n        \\hline \n    \\end{tabular} \n\\end{table}"
+    ]
+  },
+  {
+    "question": "The graph below represents the function \\( y = -2x + 5 \\). Find the \\( x \\)-intercept and \\( y \\)-intercept. \n\n \\begin{figure} \n    \\centering \n    \\includegraphics[width=0.5\\textwidth]{graph.png} \n    \\caption{Graph of \\( y = -2x + 5 \\)} \n\\end{figure}",
+    "answer": [
+      "To find the \\( x \\)-intercept, set \\( f(x) = 0 \\): \\begin{equation} 0 = -2x + 5 \\end{equation}",
+      "Solving for \\( x \\): \\begin{equation} x = 2.5 \\end{equation}",
+      "To find the \\( y \\)-intercept, set \\( x = 0 \\): \\begin{equation} f(0) = 5 \\end{equation}",
+      "Thus, the intercepts are: \\begin{equation} (2.5, 0) \\text{ and } (0, 5) \\end{equation}"
+    ],
+    "answer_template": [
+      "To find the \\( x \\)-intercept, set \\( f(x) = 0 \\): \\begin{equation} --INSERT-- \\end{equation}",
+      "Solving for \\( x \\): \\begin{equation} x = --INSERT-- \\end{equation}",
+      "To find the \\( y \\)-intercept, set \\( x = 0 \\): \\begin{equation} f(0) = --INSERT-- \\end{equation}",
+      "Thus, the intercepts are: \\begin{equation} (--INSERT--, 0) \\text{ and } (0, --INSERT--) \\end{equation}"
+    ]
+  },
+  {
+    "question": "A 10 kg object is being pushed with a force of 50N to the right and experiencing a friction force of 20N to the left. Find the acceleration and the direction of motion.",
+    "answer": [
+      "\\begin{figure} \n    \\centering \n    \\includegraphics[width=0.5\\textwidth]{forces.png} \n    \\caption{Free Body Diagram (FBD) showing a force of 50N to the right and 20N to the left.} \n\\end{figure}",
+      "Use Newton's second law: \\begin{equation} F = ma \\end{equation}",
+      "Find the net force: \\begin{equation} F_{\text{net}} = 30N \\end{equation}",
+      "Solving for acceleration: \\begin{equation} a = 3 \\text{ m/s}^2 \\end{equation}. The direction of acceleration is towards the right (right/left)."
+    ],
+    "answer_template": [
+      "Use Newton's second law: \\begin{equation} --INSERT-- \\end{equation}",
+      "Find the net force: \\begin{equation} F_{\text{net}} = --INSERT--N \\end{equation}",
+      "Solving for acceleration: \\begin{equation} a = --INSERT-- \\text{ m/s}^2 \\end{equation}. The direction of acceleration is towards the --INSERT-- (right/left)."
+    ]
+  },
+  {
+    "question": "Explain the three pillars of government.",
+    "answer": [
+      "The three main pillars of government are the Legislative, Executive, and Judiciary. The Legislative branch is responsible for making laws. In many democratic countries, this includes institutions like Parliament or Congress. The Executive branch implements and enforces laws. It includes the head of state (President or Prime Minister) and government agencies. The Judiciary interprets laws and ensures justice. It includes courts and judges who resolve legal disputes and uphold the constitution. These three branches work together to ensure a balanced and functional government system."
+    ],
+    "answer_template": [
+      ""
+    ]
+  }
+]
