@@ -1,0 +1,77 @@
+{
+  "layout": [
+    0,
+    1,
+    [
+      2,
+      3
+    ],
+    4,
+    5
+  ],
+  "elements": [
+    {
+      "id": 1,
+      "frames": [
+        {
+          "type": "text",
+          "text": "\\text{Given Data Points: } \\{4, 7, 10, 5, 8\\}",
+          "start_order": 0,
+          "end_order": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "frames": [
+        {
+          "type": "equation",
+          "text": "\\text{Mean} = \\frac{\\sum x}{n}",
+          "start_order": 1,
+          "end_order": null
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "frames": [
+        {
+          "type": "equation",
+          "text": "\\sum x = 4 + 7 + 10 + 5 + 8",
+          "start_order": 2,
+          "end_order": null
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "frames": [
+        {
+          "type": "equation",
+          "text": "= 34",
+          "start_order": 3,
+          "end_order": 4
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "frames": [
+        {
+          "type": "equation",
+          "text": "\\text{Mean} = \\frac{34}{5}",
+          "start_order": 4,
+          "end_order": null
+        }
+      ]
+    }
+  ],
+  "actual_timestamp": [
+    0,
+    1.5,
+    3.0,
+    4.0,
+    5.0,
+    6.5
+  ]
+};

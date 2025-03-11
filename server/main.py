@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,12 +22,14 @@ url = os.getenv("BACKEND_URL", "localhost")
 port = int(os.getenv("BACKEND_PORT", 8000))
 questions = json.loads(open("data/questions.json", "r").read())
 
+
 @app.get("/")
 def root():
     try:
         return {"text": "Hello World"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/questions")
 async def get_questions(req: QuestionRequest):
@@ -36,6 +39,8 @@ async def get_questions(req: QuestionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=url, port=port)
