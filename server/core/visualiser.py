@@ -9,7 +9,25 @@ from schema import VisualisationResponse
 from fastapi import HTTPException
 
 
-async def generate_visualisation_response(context: str, question: str, graph_instructions: str, table_instructions: str, image_instructions: str) -> VisualisationResponse | HTTPException:
+async def data_validation(content:str) -> VisualisationResponse | HTTPException:
+    try:
+        return VisualisationResponse.model_validate_json(content)
+    except ValidationError as e:
+        return HTTPException(status_code=500, detail=str(e))
+
+    try:
+        agent = Agent(
+            "openai:gpt-3.5-turbo",
+            result_type=VisualisationResponse,
+            retries=5,
+        )
+        res = await agent.run(content)
+        res = res.data
+        return res
+    except Exception as e:
+        return HTTPException(status_code=500, detail=str(e))
+
+async def generate_visualisation_response(context: str, question: str, answer_steps: str) -> VisualisationResponse | HTTPException:
     chat_model = ChatAnthropic(
         model_name="claude-3-sonnet-20240229", timeout=None, stop=None
     )
@@ -17,9 +35,7 @@ async def generate_visualisation_response(context: str, question: str, graph_ins
         input_variables=[
             "context",
             "question",
-            "graph_instructions",
-            "table_instructions",
-            "image_instructions",
+            "answer_steps"
         ],
         template="""
 You are an AI responsible for creating a dynamic JSON for educational visualizations.
@@ -29,6 +45,9 @@ You are an AI responsible for creating a dynamic JSON for educational visualizat
 
 ## Question
 {question}
+
+## Answer
+{answer_steps}
 
 ## Output Format
 You need to generate a JSON with the following structure:
@@ -41,7 +60,7 @@ You need to generate a JSON with the following structure:
       "frames": [
         {
           "type": "text",
-          "text": "The text or equation here",
+          "text": "The text here",
           "start_order": 0,
           "end_order": null
         }
@@ -62,39 +81,60 @@ You need to generate a JSON with the following structure:
 }
 
 ## Rules for JSON Generation
-1. **Layout:** Follow the pattern for layout as `[1, [2, 3], 4]`. The rows with multiple elements should be justified and look visually connected.
-2. **Frames:** Each element can have multiple frames (like text → equation → answer).
-3. **End Order:** If content stays visible until the end, set `"end_order": null`. Otherwise, use an integer for when it should disappear.
-4. **No Markdown Output:** Only output pure JSON. No text, no explanations.
+1. **Layout:**
+   - Follow a layout like `[1, [2, 3], 4]`. Rows with multiple elements should be visually connected.
+   - Ensure logical flow in the layout matching the sequential answer steps.
+   - The number of entries in layout must match the number of elements.
 
-## Special Handling Instructions
-1. **Graphs:**
-{graph_instructions}
+2. **Frames:**
+   - Each step in the answer must map to a visual element (text or equation).
+   - If the step contains a formula, use an **equation frame**. For text, use a **text frame**.
+   - Multiple frames in the same element should indicate progressive steps (like showing a formula and then calculating it).
 
-2. **Tables:**
-{table_instructions}
+3. **Start and End Order:**
+   - Start the first frame with `start_order=0` and increase sequentially.
+   - If an element stays visible till the end, set `end_order=null`. Otherwise, specify an integer for its disappearance.
 
-3. **Images or Vector Diagrams:**
-{image_instructions}
+4. **Equation Frame Rules:**
+   - All mathematical content must use the **EquationFrame** format:
+   ```json
+   {
+     "type": "equation",
+     "text": "LaTeX equation",
+     "start_order": 1,
+     "end_order": null
+   }
+   ```
+   - Ensure LaTeX syntax is clean and precise.
+
+5. **Grouping Elements:**
+    - Group connected content (text + equation or multi-step calculations) side-by-side where relevant.
+    - Use justified grid layouts for such groupings.
+
+6. **Strict Output:**
+    - Only generate pure JSON output. Avoid any explanations, markdown, or extra text.
+    - Ensure it follows the exact format.
 
 ## Expected Output
-You must only generate a pure JSON without any additional explanation or text.
+A pure JSON following the structure defined without any explanation or markdown.
 Output:
 """,
 )
 
-    context = "We are teaching the concept of arithmetic mean using a dataset of numbers."
-    question = "How do you calculate the mean of the data: {4, 7, 10, 5, 8}?"
-    graph_instructions = "If a graph is needed, generate a simple bar graph with 'Data Points' on X-axis and 'Values' on Y-axis."
-    table_instructions = "If a table is needed, generate a simple 2-column table with 'Data Point' and 'Value'."
-    image_instructions = "If an image is needed, it can be a simple line chart or vector diagram to visualize the concept."
+    # ## Special Handling Instructions
+    # 1. **Graphs:**
+    # {graph_instructions}
+
+    # 2. **Tables:**
+    # {table_instructions}
+
+    # 3. **Images or Vector Diagrams:**
+    # {image_instructions}
 
     full_prompt = prompt_template.format(
         context=context,
         question=question,
-        graph_instructions=graph_instructions,
-        table_instructions=table_instructions,
-        image_instructions=image_instructions,
+        answer_steps = answer_steps
     )
 
     response = chat_model.invoke(full_prompt)
@@ -106,24 +146,17 @@ Output:
         elif isinstance(content, list):
             first_item = content[0] if content else None
             if isinstance(first_item, str):
-                visualization_json = VisualisationResponse.model_validate_json(first_item)
+                res = await data_validation(first_item)
+                return res
             elif isinstance(first_item, dict):
                 visualization_json = VisualisationResponse(**first_item)
+                return visualization_json
             else:
-                raise ValueError("First item in content list is neither a string nor a dictionary.")
+                return HTTPException(status_code=500, detail="First item in content list is neither a string nor a dictionary.")
         elif isinstance(content, str):
-            visualization_json = VisualisationResponse.model_validate_json(content)
+            res = await data_validation(content)
+            return res
         else:
-            raise ValueError("Unexpected response content type.")
+            return HTTPException(status_code=500, detail="Unexpected response content type.")
     except (json.JSONDecodeError, ValidationError) as e:
-        try:
-            agent = Agent(
-                "openai:gpt-3.5-turbo",
-                result_type=VisualisationResponse,
-                retries=5,
-            )
-            res = await agent.run(content)
-            res = res.data
-        raise ValueError(f"Error processing response content: {e}")
-
-    return visualization_json
+        return HTTPException(status_code=500, detail=f"Error processing response content: {e}")

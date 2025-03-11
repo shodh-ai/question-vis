@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from schema import QuestionRequest
+from schema import QuestionRequest, VisualisationRequest
+from core import generate_visualisation_response
 
 app = FastAPI()
 load_dotenv()
@@ -36,6 +37,15 @@ async def get_questions(req: QuestionRequest):
     try:
         if req.type == "example":
             return questions[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/visualisations")
+async def get_visualisations(req: VisualisationRequest):
+    try:
+        if req.type == "example":
+            return generate_visualisation_response(req.context, req.question, req.answer)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

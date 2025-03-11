@@ -39,5 +39,6 @@ class VisualisationResponse(BaseModel):
 
 class VisualisationRequest(BaseModel):
     type: str
+    context: str
     question: str
     answer: str
