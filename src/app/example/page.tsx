@@ -52,7 +52,7 @@ const HomePage = () => {
       <div className='flex h-[15%] w-[90%] m-4 p-4 text-center justify-center items-center'>
         {renderedQuestion || question?.question}
       </div>
-      <div className='h-[80%] w-[80%] m-4 overflow-y-auto overflow-x-hidden border rounded'>
+      <div className='h-[80%] w-[80%] m-4 overflow-y-auto overflow-x-hidden'>
         <Visualiser visualization={visualization} currIndex={currentIndex} />
       </div>
       <FloatingNav onBack={handleBack} onForward={handleForward} onRefresh={() => window.location.reload()} />
