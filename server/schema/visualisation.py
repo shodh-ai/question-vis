@@ -41,4 +41,4 @@ class VisualisationRequest(BaseModel):
     type: str
     context: str
     question: str
-    answer: str
+    answer: List[str]

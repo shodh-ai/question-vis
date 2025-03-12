@@ -2,6 +2,7 @@ import json
 
 from langchain.prompts import PromptTemplate
 from langchain_anthropic import ChatAnthropic
+from typing import List
 from pydantic import ValidationError
 from pydantic_ai import Agent
 
@@ -27,7 +28,7 @@ async def data_validation(content:str) -> VisualisationResponse | HTTPException:
     except Exception as e:
         return HTTPException(status_code=500, detail=str(e))
 
-async def generate_visualisation_response(context: str, question: str, answer_steps: str) -> VisualisationResponse | HTTPException:
+async def generate_visualisation_response(context: str, question: str, answer_steps: List[str]) -> VisualisationResponse | HTTPException:
     chat_model = ChatAnthropic(
         model_name="claude-3-sonnet-20240229", timeout=None, stop=None
     )
