@@ -35,7 +35,7 @@ async def generate_transcription_response(
     try:
         chat_model = ChatOpenAI(name="gpt-3.5-turbo")
         prompt_template = PromptTemplate(
-            input_variables=["json_data"],
+            input_variables=["json_data", "question", "answer"],
             template="""
 You are given a JSON data structure representing a visualization of an educational concept. The JSON contains:
 
@@ -58,6 +58,11 @@ You are given a JSON data structure representing a visualization of an education
             - **equation**: The LaTeX equation to display on the page.
             - **start_order**: The order in which it appears in animation.
             - **end_order**: The order in which it disappears in animation (null if it remains until the end).
+
+Additionally, you are given the following variables:
+
+- **question**: The main question being explained with the visualization.
+- **answer_steps**: The step-by-step explanation and solution to the question.
 
 Your task is to generate a natural, human-like conversational transcript for this visualization as a whole, not for individual elements.
 
@@ -87,13 +92,21 @@ The transcript should be continuous, like a teacher speaking without interruptio
 
 Now generate the entire transcript as a whole.
 
+Question:
+{question}
+
+Answer Steps:
+{answer_steps}
+
 JSON Data:
 {json_data}
 
 Generate now:
             """,
         )
-        full_prompt = prompt_template.format(json_data=json.dumps(visualisation.dict()))
+        full_prompt = prompt_template.format(
+            json_data=json.dumps(visualisation.dict()), question=question, answer=answer
+        )
         response = chat_model.invoke(full_prompt)
         content = response.content
         if content is None:
