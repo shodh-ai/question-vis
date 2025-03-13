@@ -1,16 +1,16 @@
 import json
+from typing import List
 
+from fastapi import HTTPException
 from langchain.prompts import PromptTemplate
 from langchain_anthropic import ChatAnthropic
-from typing import List
 from pydantic import ValidationError
 from pydantic_ai import Agent
 
 from schema import VisualisationResponse
-from fastapi import HTTPException
 
 
-async def data_validation(content:str) -> VisualisationResponse | HTTPException:
+async def data_validation(content: str) -> VisualisationResponse | HTTPException:
     try:
         return VisualisationResponse.model_validate_json(content)
     except ValidationError as e:
@@ -28,16 +28,15 @@ async def data_validation(content:str) -> VisualisationResponse | HTTPException:
     except Exception as e:
         return HTTPException(status_code=500, detail=str(e))
 
-async def generate_visualisation_response(context: str, question: str, answer_steps: List[str]) -> VisualisationResponse | HTTPException:
+
+async def generate_visualisation_response(
+    context: str, question: str, answer_steps: List[str]
+) -> VisualisationResponse | HTTPException:
     chat_model = ChatAnthropic(
         model_name="claude-3-sonnet-20240229", timeout=None, stop=None
     )
     prompt_template = PromptTemplate(
-        input_variables=[
-            "context",
-            "question",
-            "answer_steps"
-        ],
+        input_variables=["context", "question", "answer_steps"],
         template="""
 You are an AI responsible for creating a dynamic JSON for educational visualizations.
 
@@ -120,7 +119,7 @@ You need to generate a JSON with the following structure:
 A pure JSON following the structure defined without any explanation or markdown.
 Output:
 """,
-)
+    )
 
     # ## Special Handling Instructions
     # 1. **Graphs:**
@@ -133,9 +132,7 @@ Output:
     # {image_instructions}
 
     full_prompt = prompt_template.format(
-        context=context,
-        question=question,
-        answer_steps = answer_steps
+        context=context, question=question, answer_steps=answer_steps
     )
 
     response = chat_model.invoke(full_prompt)
@@ -143,7 +140,7 @@ Output:
 
     try:
         if content is None:
-           return HTTPException(status_code=500, detail="No response received")
+            return HTTPException(status_code=500, detail="No response received")
         elif isinstance(content, list):
             first_item = content[0] if content else None
             if isinstance(first_item, str):
@@ -153,11 +150,18 @@ Output:
                 visualization_json = VisualisationResponse(**first_item)
                 return visualization_json
             else:
-                return HTTPException(status_code=500, detail="First item in content list is neither a string nor a dictionary.")
+                return HTTPException(
+                    status_code=500,
+                    detail="First item in content list is neither a string nor a dictionary.",
+                )
         elif isinstance(content, str):
             res = await data_validation(content)
             return res
         else:
-            return HTTPException(status_code=500, detail="Unexpected response content type.")
+            return HTTPException(
+                status_code=500, detail="Unexpected response content type."
+            )
     except (json.JSONDecodeError, ValidationError) as e:
-        return HTTPException(status_code=500, detail=f"Error processing response content: {e}")
+        return HTTPException(
+            status_code=500, detail=f"Error processing response content: {e}"
+        )

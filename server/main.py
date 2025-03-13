@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from schema import QuestionRequest, VisualisationRequest, TranscriptionRequest
-from core import generate_visualisation_response, generate_transcription_response
+from core import generate_transcription_response, generate_visualisation_response
+from schema import QuestionRequest, TranscriptionRequest, VisualisationRequest
 
 app = FastAPI()
 load_dotenv()
@@ -45,15 +45,20 @@ async def get_questions(req: QuestionRequest):
 async def get_visualisations(req: VisualisationRequest):
     try:
         if req.type == "example":
-            return generate_visualisation_response(req.context, req.question, req.answer)
+            return generate_visualisation_response(
+                req.context, req.question, req.answer
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/transcription")
-async def get_transcription(req:TranscriptionRequest):
+async def get_transcription(req: TranscriptionRequest):
     try:
         if req.type == "example":
-            return generate_transcription_response(req.question, req.answer, req.visualisation)
+            return generate_transcription_response(
+                req.question, req.answer, req.visualisation
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

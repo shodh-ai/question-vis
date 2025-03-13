@@ -1,6 +1,6 @@
 from .question import QuestionRequest, QuestionResponse
-from .visualisation import VisualisationRequest, VisualisationResponse
 from .transcription import TranscriptionRequest, TranscriptionResponse
+from .visualisation import VisualisationRequest, VisualisationResponse
 
 __all__ = [
     "QuestionRequest",
