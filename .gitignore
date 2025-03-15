@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 .ropeproject
+server/.ruff_cache
+.ruff_cache
+server/**/__pycache__

@@ -9,11 +9,28 @@
       "Solving for \\( y \\): \\begin{equation} y = 2.72 \\end{equation}"
     ],
     "answer_template": [
-      "Multiply the second equation by --INSERT--: \\begin{equation} --INSERT-- \\end{equation}",
-      "Add the two equations: \\begin{equation} --INSERT--x = 27 \\end{equation}",
-      "Solve for \\( x \\): \\begin{equation} x = --INSERT-- \\end{equation}",
-      "Substituting \\( x \\) in the first equation: \\begin{equation} --INSERT-- + --INSERT--y = 12 \\end{equation}",
-      "Solving for \\( y \\): \\begin{equation} y = --INSERT-- \\end{equation}"
+      [
+        "Multiply the second equation by --INSERT--: \\begin{equation} --INSERT-- \\end{equation}",
+        "3",
+        "12x - 3y = 15"
+      ],
+      [
+        "Add the two equations: \\begin{equation} --INSERT--x = 27 \\end{equation}",
+        "14"
+      ],
+      [
+        "Solve for \\( x \\): \\begin{equation} x = --INSERT-- \\end{equation}",
+        "1.92"
+      ],
+      [
+        "Substituting \\( x \\) in the first equation: \\begin{equation} --INSERT-- + --INSERT--y = 12 \\end{equation}",
+        "3.84",
+        "3"
+      ],
+      [
+        "Solving for \\( y \\): \\begin{equation} y = --INSERT-- \\end{equation}",
+        "2.72"
+      ]
     ]
   },
   {
