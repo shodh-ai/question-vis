@@ -13,27 +13,27 @@ from schema import VisualisationResponse
 async def data_validation(content: str) -> VisualisationResponse | HTTPException:
     try:
         return VisualisationResponse.model_validate_json(content)
-    except ValidationError as e:
-        return HTTPException(status_code=500, detail=str(e))
-
-    try:
-        agent = Agent(
-            "openai:gpt-3.5-turbo",
-            result_type=VisualisationResponse,
-            retries=5,
-        )
-        res = await agent.run(content)
-        res = res.data
-        return res
-    except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+    except ValidationError:
+        try:
+            agent = Agent(
+                "openai:gpt-3.5-turbo",
+                result_type=VisualisationResponse,
+                retries=5,
+            )
+            res = await agent.run(content)
+            res = res.data
+            return res
+        except ValidationError as e:
+            return HTTPException(status_code=500, detail=str(e))
+        except Exception as e:
+            return HTTPException(status_code=501, detail=str(e))
 
 
 async def generate_visualisation_response(
     context: str, question: str, answer_steps: List[str]
 ) -> VisualisationResponse | HTTPException:
     chat_model = ChatAnthropic(
-        model_name="claude-3-sonnet-20240229", timeout=None, stop=None
+        model_name="claude-3-7-sonnet-latest", timeout=None, stop=None
     )
     prompt_template = PromptTemplate(
         input_variables=["context", "question", "answer_steps"],
@@ -52,33 +52,33 @@ You are an AI responsible for creating a dynamic JSON for educational visualizat
 ## Output Format
 You need to generate a JSON with the following structure:
 
-{
+{{
   "layout": [1, [2, 3], 4],
   "elements": [
-    {
+    {{
       "id": 1,
+      "type": "text",
       "frames": [
-        {
-          "type": "text",
+        {{
           "text": "The text here",
           "start_order": 0,
           "end_order": null
-        }
+        }}
       ]
-    },
-    {
+    }},
+    {{
       "id": 2,
+      "type": "equation",
       "frames": [
-        {
-          "type": "equation",
-          "text": "LaTeX equation here",
+        {{
+          "equation": "LaTeX equation here",
           "start_order": 1,
           "end_order": null
-        }
+        }}
       ]
-    }
+    }}
   ]
-}
+}}
 
 ## Rules for JSON Generation
 1. **Layout:**
@@ -98,12 +98,11 @@ You need to generate a JSON with the following structure:
 4. **Equation Frame Rules:**
    - All mathematical content must use the **EquationFrame** format:
    ```json
-   {
-     "type": "equation",
-     "text": "LaTeX equation",
+   {{
+     "equation": "LaTeX equation",
      "start_order": 1,
      "end_order": null
-   }
+   }}
    ```
    - Ensure LaTeX syntax is clean and precise.
 
@@ -138,9 +137,13 @@ Output:
     response = chat_model.invoke(full_prompt)
     content = response.content
 
+    # print("====================================")
+    # print(content)
+    # print("====================================")
+
     try:
         if content is None:
-            return HTTPException(status_code=500, detail="No response received")
+            return HTTPException(status_code=502, detail="No response received")
         elif isinstance(content, list):
             first_item = content[0] if content else None
             if isinstance(first_item, str):
@@ -151,7 +154,7 @@ Output:
                 return visualization_json
             else:
                 return HTTPException(
-                    status_code=500,
+                    status_code=503,
                     detail="First item in content list is neither a string nor a dictionary.",
                 )
         elif isinstance(content, str):
@@ -159,9 +162,9 @@ Output:
             return res
         else:
             return HTTPException(
-                status_code=500, detail="Unexpected response content type."
+                status_code=504, detail="Unexpected response content type."
             )
     except (json.JSONDecodeError, ValidationError) as e:
         return HTTPException(
-            status_code=500, detail=f"Error processing response content: {e}"
+            status_code=505, detail=f"Error processing response content: {e}"
         )

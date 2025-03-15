@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing_extensions import List
+
 from .visualisation import VisualisationResponse as Visualisation
 
 

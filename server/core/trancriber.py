@@ -13,20 +13,20 @@ from schema import TranscriptionResponse, VisualisationResponse
 async def data_validation(content: str) -> TranscriptionResponse | HTTPException:
     try:
         return TranscriptionResponse.model_validate_json(content)
-    except ValidationError as e:
-        return HTTPException(status_code=500, detail=str(e))
-
-    try:
-        agent = Agent(
-            "openai:gpt-3.5-turbo",
-            result_type=TranscriptionResponse,
-            retries=5,
-        )
-        res = await agent.run(content)
-        res = res.data
-        return res
-    except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+    except ValidationError:
+        try:
+            agent = Agent(
+                "openai:gpt-3.5-turbo",
+                result_type=TranscriptionResponse,
+                retries=5,
+            )
+            res = await agent.run(content)
+            res = res.data
+            return res
+        except ValidationError as e:
+            return HTTPException(status_code=503, detail=str(e))
+        except Exception as e:
+            return HTTPException(status_code=500, detail=str(e))
 
 
 async def generate_transcription_response(
@@ -69,22 +69,26 @@ Your task is to generate a natural, human-like conversational transcript for thi
 The transcript should be structured as a JSON object containing a string array.
 
 ```json
-    [
-    "Human-like sentence explain the frames displayed at order 0",
-    "Human-like sentence explain the frames displayed at order 1",
-    ...
-    ]
+    {{
+        "text": [
+            "Human-like sentence explain the frames displayed at order 0",
+            "Human-like sentence explain the frames displayed at order 1",
+            ...
+            ]
+    }}
 ```
 
 For example:
 
-    [
-        "Given Data Points: 4, 7, 10, 5, 8.",
-        "Mean is equal to the sum of the data points divided by the number of data points.",
-        "Adding the data points together: four plus seven plus ten plus five plus eight.",
-        "This gives us a sum of thirty-four.",
-        "Now, dividing the sum by the number of data points, we have: thirty-four divided by five."
-    ]
+    {{
+        "text": [
+                "Given Data Points: 4, 7, 10, 5, 8.",
+                "Mean is equal to the sum of the data points divided by the number of data points.",
+                "Adding the data points together: four plus seven plus ten plus five plus eight.",
+                "This gives us a sum of thirty-four.",
+                "Now, dividing the sum by the number of data points, we have: thirty-four divided by five."
+            ]
+    }}
 
 The language should be natural, easy to understand, and engaging. Avoid technical jargon and make it sound like a teacher explaining the concept.
 
@@ -105,10 +109,17 @@ Generate now:
             """,
         )
         full_prompt = prompt_template.format(
-            json_data=json.dumps(visualisation.dict()), question=question, answer=answer
+            json_data=json.dumps(visualisation.dict()),
+            question=question,
+            answer_steps=answer,
         )
         response = chat_model.invoke(full_prompt)
         content = response.content
+
+        # print("====================================")
+        # print(content)
+        # print("====================================")
+
         if content is None:
             return HTTPException(status_code=500, detail="No response received")
         elif isinstance(content, list):
